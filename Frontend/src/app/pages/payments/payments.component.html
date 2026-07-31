@@ -1,0 +1,273 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Payments</h1>
+    <button class="btn btn-primary" (click)="openAdd()">+ Record Payment</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <span class="stat-value">{{ stats.total }}</span>
+      <span class="stat-label">Total Payments</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ stats.revenue | currency }}</span>
+      <span class="stat-label">Total Revenue</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ stats.today }}</span>
+      <span class="stat-label">Today's Payments</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ stats.todayRevenue | currency }}</span>
+      <span class="stat-label">Today's Revenue</span>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="showForm">
+    <div class="card-header">
+      <h2>{{ editing ? 'Update Payment' : 'Record Payment' }}</h2>
+      <button class="btn-close" (click)="closeForm()">&times;</button>
+    </div>
+    <form (ngSubmit)="onSave()" class="payment-form" *ngIf="!editing || editing.status === 'pending'">
+      <div class="form-group">
+        <label>Select Booking <span class="req">*</span></label>
+        <select [(ngModel)]="form.booking" name="booking" (change)="onBookingChange()" required [disabled]="editing?.status === 'pending'">
+          <option value="">Select a booking...</option>
+          <option *ngFor="let b of bookings" [value]="b._id">
+            #{{ b.room?.roomNumber }} - {{ b.customer?.name }} ({{ b.totalAmount | currency }})
+          </option>
+        </select>
+      </div>
+
+      <div class="booking-preview" *ngIf="selectedBooking">
+        <div class="preview-row"><span class="preview-label">Customer</span><span>{{ selectedBooking.customer?.name }}</span></div>
+        <div class="preview-row"><span class="preview-label">Room</span><span>#{{ selectedBooking.room?.roomNumber }} ({{ selectedBooking.room?.type }})</span></div>
+        <div class="preview-row"><span class="preview-label">Check In</span><span>{{ selectedBooking.checkIn | date:'mediumDate' }}</span></div>
+        <div class="preview-row"><span class="preview-label">Check Out</span><span>{{ selectedBooking.checkOut | date:'mediumDate' }}</span></div>
+        <div class="preview-row"><span class="preview-label">Booking Amount</span><span class="preview-amount">{{ selectedBooking.totalAmount | currency }}</span></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Amount <span class="req">*</span></label>
+          <input type="number" [(ngModel)]="form.amount" name="amount" min="0" step="0.01" placeholder="e.g. 150.00" required />
+        </div>
+        <div class="form-group">
+          <label>Payment Method <span class="req">*</span></label>
+          <div class="method-select">
+            <label class="method-option" [class.selected]="form.method === 'cash'">
+              <input type="radio" [(ngModel)]="form.method" name="method" value="cash" (change)="onMethodChange()" />
+              <span class="method-icon">&#x1F4B5;</span>
+              <span>Cash</span>
+            </label>
+            <label class="method-option" [class.selected]="form.method === 'card'">
+              <input type="radio" [(ngModel)]="form.method" name="method" value="card" (change)="onMethodChange()" />
+              <span class="method-icon">&#x1F0CF;</span>
+              <span>Card</span>
+            </label>
+            <label class="method-option" [class.selected]="form.method === 'qr'">
+              <input type="radio" [(ngModel)]="form.method" name="method" value="qr" (change)="onMethodChange()" />
+              <span class="method-icon">&#x1F4F1;</span>
+              <span>QR</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row" *ngIf="form.method === 'card'">
+        <div class="form-group">
+          <label>Card Last 4 Digits</label>
+          <input type="text" [(ngModel)]="form.cardLastFour" name="cardLastFour" maxlength="4" placeholder="e.g. 1234" />
+        </div>
+      </div>
+
+      <div class="form-row" *ngIf="form.method === 'qr'">
+        <div class="form-group">
+          <label>QR Reference</label>
+          <input type="text" [(ngModel)]="form.qrReference" name="qrReference" placeholder="Auto-generated" />
+        </div>
+      </div>
+      <div class="qr-display" *ngIf="form.method === 'qr' && qrDataUrl">
+        <p class="qr-label">Scan to pay</p>
+        <img [src]="qrDataUrl" alt="QR Code" class="qr-img" />
+        <p class="qr-ref">Ref: {{ form.qrReference }}</p>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Discount</label>
+          <input type="number" [(ngModel)]="form.discount" name="discount" min="0" step="0.01" placeholder="e.g. 10" (input)="updateFinalAmount()" />
+        </div>
+        <div class="form-group">
+          <label>Discount Type</label>
+          <select [(ngModel)]="form.discountType" name="discountType" (change)="updateFinalAmount()">
+            <option value="fixed">Fixed ($)</option>
+            <option value="percentage">Percentage (%)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="final-amount" *ngIf="form.amount">
+        <span>Final Amount: <strong>{{ getFinalAmount() | currency }}</strong></span>
+        <span class="discount-badge" *ngIf="form.discount > 0">
+          ({{ form.discountType === 'percentage' ? form.discount + '%' : (form.discount | currency) }} off)
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea [(ngModel)]="form.notes" name="notes" rows="2" placeholder="Optional notes..."></textarea>
+      </div>
+
+      <p class="error-msg" *ngIf="formError">{{ formError }}</p>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving">
+          {{ saving ? 'Processing...' : 'Complete Payment' }}
+        </button>
+      </div>
+    </form>
+
+    <div class="payment-form" *ngIf="editing && editing.status !== 'pending'">
+      <div class="form-group">
+        <label>Status</label>
+        <select [(ngModel)]="editStatus" name="editStatus">
+          <option value="completed">Completed</option>
+          <option value="refunded">Refunded</option>
+          <option value="failed">Failed</option>
+        </select>
+      </div>
+      <p class="error-msg" *ngIf="formError">{{ formError }}</p>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+        <button class="btn btn-primary" (click)="onUpdateStatus()" [disabled]="saving">
+          {{ saving ? 'Saving...' : 'Update Status' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>Payment History</h2>
+      <div class="filter-bar">
+        <select [(ngModel)]="methodFilter" (change)="applyFilter()">
+          <option value="">All Methods</option>
+          <option value="cash">Cash</option>
+          <option value="card">Card</option>
+          <option value="qr">QR</option>
+        </select>
+        <select [(ngModel)]="statusFilter" (change)="applyFilter()">
+          <option value="">All Status</option>
+          <option value="completed">Completed</option>
+          <option value="refunded">Refunded</option>
+          <option value="failed">Failed</option>
+        </select>
+        <input type="text" [(ngModel)]="searchTerm" (input)="applyFilter()" placeholder="Search receipt, customer..." />
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table *ngIf="filtered.length; else empty">
+        <thead>
+          <tr>
+            <th>Receipt #</th>
+            <th>Customer</th>
+            <th>Room</th>
+            <th>Amount</th>
+            <th>Discount</th>
+            <th>Final</th>
+            <th>Method</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of filtered">
+            <td><strong>{{ p.receiptNumber }}</strong></td>
+            <td>{{ p.booking?.customer?.name || '---' }}</td>
+            <td>#{{ p.booking?.room?.roomNumber || '---' }}</td>
+            <td>{{ p.amount | currency }}</td>
+            <td>
+              <span *ngIf="p.discount > 0; else noDiscount">
+                {{ p.discountType === 'percentage' ? p.discount + '%' : (p.discount | currency) }}
+              </span>
+              <ng-template #noDiscount><span class="muted">---</span></ng-template>
+            </td>
+            <td><strong>{{ p.finalAmount | currency }}</strong></td>
+            <td>
+              <span class="method-badge" [ngClass]="p.method">{{ methodLabel(p.method) }}</span>
+            </td>
+            <td>{{ p.createdAt | date:'mediumDate' }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="p.status">
+                <span class="status-dot" [ngClass]="statusDotClass(p.status)"></span>
+                {{ p.status }}
+              </span>
+            </td>
+            <td>
+              <div class="action-btns">
+                <button class="icon-btn" *ngIf="p.status === 'pending'" title="Complete payment" (click)="completePayment(p)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+                <button class="icon-btn" title="View receipt" (click)="viewReceipt(p)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>
+                </button>
+                <button class="icon-btn" title="Edit" (click)="openEdit(p)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                </button>
+                <button class="icon-btn" title="Delete" (click)="onDelete(p)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #empty>
+        <div class="empty-state">
+          <p>{{ payments.length ? 'No payments match your filter.' : 'No payments yet. Payments are auto-created when customers book online.' }}</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showReceipt" (click)="showReceipt = false">
+  <div class="receipt-modal" (click)="$event.stopPropagation()">
+    <button class="btn-close" (click)="showReceipt = false">&times;</button>
+    <div class="receipt" #receiptContent>
+      <div class="receipt-header">
+        <h2>SETEC Hotel</h2>
+        <p class="receipt-sub">Booking Management System</p>
+        <p class="receipt-no">Receipt #{{ receiptData.receiptNumber }}</p>
+      </div>
+      <div class="receipt-divider"></div>
+      <div class="receipt-body">
+        <div class="receipt-row"><span>Date:</span><span>{{ receiptData.createdAt | date:'medium' }}</span></div>
+        <div class="receipt-row"><span>Customer:</span><span>{{ receiptData.booking?.customer?.name }}</span></div>
+        <div class="receipt-row"><span>Room:</span><span>#{{ receiptData.booking?.room?.roomNumber }} ({{ receiptData.booking?.room?.type || '---' }})</span></div>
+        <div class="receipt-row"><span>Check In:</span><span>{{ receiptData.booking?.checkIn | date:'mediumDate' }}</span></div>
+        <div class="receipt-row"><span>Check Out:</span><span>{{ receiptData.booking?.checkOut | date:'mediumDate' }}</span></div>
+        <div class="receipt-divider"></div>
+        <div class="receipt-row"><span>Payment Method:</span><span>{{ methodLabel(receiptData.method) }}</span></div>
+        <div class="receipt-row" *ngIf="receiptData.cardLastFour"><span>Card:</span><span>****{{ receiptData.cardLastFour }}</span></div>
+        <div class="receipt-row" *ngIf="receiptData.qrReference"><span>QR Ref:</span><span>{{ receiptData.qrReference }}</span></div>
+        <div class="receipt-qr" *ngIf="receiptData.method === 'qr' && receiptQrUrl">
+          <img [src]="receiptQrUrl" alt="QR Code" />
+        </div>
+        <div class="receipt-row"><span>Subtotal:</span><span>{{ receiptData.amount | currency }}</span></div>
+        <div class="receipt-row" *ngIf="receiptData.discount > 0">
+          <span>Discount ({{ receiptData.discountType === 'percentage' ? receiptData.discount + '%' : (receiptData.discount | currency) }}):</span>
+          <span class="discount-text">-{{ receiptData.discountType === 'percentage' ? (receiptData.amount * receiptData.discount / 100 | currency) : (receiptData.discount | currency) }}</span>
+        </div>
+        <div class="receipt-total"><span>Total Paid:</span><span>{{ receiptData.finalAmount | currency }}</span></div>
+      </div>
+      <div class="receipt-divider"></div>
+      <div class="receipt-footer">
+        <p>Thank you for your stay!</p>
+        <button class="btn btn-primary" (click)="printReceipt()">Print Receipt</button>
+      </div>
+    </div>
+  </div>
+</div>

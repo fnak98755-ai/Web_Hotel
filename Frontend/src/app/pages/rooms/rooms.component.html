@@ -1,0 +1,144 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Rooms</h1>
+    <button class="btn btn-primary" (click)="openAdd()">+ Add Room</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <span class="stat-value">{{ stats.total }}</span>
+      <span class="stat-label">Total Rooms</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ stats.available }}</span>
+      <span class="stat-label">Available</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ stats.booked }}</span>
+      <span class="stat-label">Booked</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ stats.maintenance }}</span>
+      <span class="stat-label">Maintenance</span>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="showForm">
+    <div class="card-header">
+      <h2>{{ editing ? 'Edit Room' : 'Add Room' }}</h2>
+      <button class="btn-close" (click)="closeForm()">&times;</button>
+    </div>
+    <form (ngSubmit)="onSave()" class="room-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Room Number <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="form.roomNumber" name="roomNumber" placeholder="e.g. 101" required />
+        </div>
+        <div class="form-group">
+          <label>Room Type <span class="req">*</span></label>
+          <select [(ngModel)]="form.type" name="type" required>
+            <option value="">Select type...</option>
+            <option *ngFor="let t of roomTypes" [value]="t">{{ roomTypeLabel(t) }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Price per Night <span class="req">*</span></label>
+          <input type="number" [(ngModel)]="form.pricePerNight" name="pricePerNight" min="1" placeholder="e.g. 150" required />
+        </div>
+        <div class="form-group">
+          <label>Capacity <span class="req">*</span></label>
+          <input type="number" [(ngModel)]="form.capacity" name="capacity" min="1" placeholder="e.g. 2" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea [(ngModel)]="form.description" name="description" rows="3" placeholder="Room description..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Amenities (comma-separated)</label>
+        <input type="text" [(ngModel)]="form.amenities" name="amenities" placeholder="e.g. WiFi, TV, Air Conditioning, Mini Bar" />
+      </div>
+      <p class="error-msg" *ngIf="formError">{{ formError }}</p>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving">
+          {{ saving ? 'Saving...' : (editing ? 'Update Room' : 'Add Room') }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>Room List</h2>
+      <div class="filter-bar">
+        <select [(ngModel)]="typeFilter" (change)="applyFilter()">
+          <option value="">All Types</option>
+          <option *ngFor="let t of roomTypes" [value]="t">{{ roomTypeLabel(t) }}</option>
+        </select>
+        <select [(ngModel)]="statusFilter" (change)="applyFilter()">
+          <option value="">All Status</option>
+          <option value="available">Available</option>
+          <option value="booked">Booked</option>
+          <option value="maintenance">Maintenance</option>
+        </select>
+        <input type="text" [(ngModel)]="searchTerm" (input)="applyFilter()" placeholder="Search room number..." />
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table *ngIf="filtered.length; else empty">
+        <thead>
+          <tr>
+            <th>Room #</th>
+            <th>Type</th>
+            <th>Price/Night</th>
+            <th>Capacity</th>
+            <th>Amenities</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of filtered">
+            <td><strong>#{{ r.roomNumber }}</strong></td>
+            <td><span class="type-badge" [ngClass]="r.type">{{ roomTypeLabel(r.type) }}</span></td>
+            <td>{{ r.pricePerNight | currency }}</td>
+            <td>{{ r.capacity }} {{ r.capacity === 1 ? 'guest' : 'guests' }}</td>
+            <td>
+              <div class="amenities-list" *ngIf="r.amenities?.length; else noAmenities">
+                <span class="amenity-tag" *ngFor="let a of r.amenities">{{ a }}</span>
+              </div>
+              <ng-template #noAmenities><span class="muted">---</span></ng-template>
+            </td>
+            <td>
+              <span class="status-badge" [ngClass]="r.currentStatus || (r.isAvailable ? 'available' : 'maintenance')">
+                <span class="status-dot" [ngClass]="(r.currentStatus || (r.isAvailable ? 'available' : 'maintenance')) === 'booked' ? 'orange' : ((r.currentStatus || (r.isAvailable ? 'available' : 'maintenance')) === 'available' ? 'green' : 'red')"></span>
+                {{ (r.currentStatus || (r.isAvailable ? 'Available' : 'Maintenance')) | titlecase }}
+              </span>
+            </td>
+            <td>
+              <div class="action-btns">
+                <button class="icon-btn" title="Edit" (click)="openEdit(r)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                </button>
+                <button class="icon-btn" *ngIf="r.currentStatus !== 'booked'" [title]="r.isAvailable ? 'Set Maintenance' : 'Set Available'" (click)="toggleStatus(r)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                </button>
+                <button class="icon-btn" title="Delete" (click)="onDelete(r)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #empty>
+        <div class="empty-state">
+          <p>{{ rooms.length ? 'No rooms match your filter.' : 'No rooms yet. Add your first room!' }}</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

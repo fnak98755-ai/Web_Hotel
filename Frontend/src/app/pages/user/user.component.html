@@ -1,0 +1,97 @@
+<div class="page">
+  <div class="page-header">
+    <h1>User Management</h1>
+    <button class="btn btn-primary" *ngIf="isAdmin" (click)="openAdd()">+ Add User</button>
+  </div>
+
+  <div class="profile-card card">
+    <div class="card-header">
+      <h2>My Profile</h2>
+    </div>
+    <div class="profile-body">
+      <div class="profile-avatar">{{ userEmail.charAt(0).toUpperCase() }}</div>
+      <div class="profile-info">
+        <div class="info-row"><span class="label">Email</span><span>{{ userEmail }}</span></div>
+        <div class="info-row"><span class="label">Role</span><span class="role-badge" [ngClass]="userRole">{{ userRole | titlecase }}</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="isAdmin">
+    <div class="card-header">
+      <h2>All Users</h2>
+    </div>
+    <div class="table-wrap">
+      <table *ngIf="users.length; else empty">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of users">
+            <td><strong>{{ u.username }}</strong></td>
+            <td>{{ u.email }}</td>
+            <td><span class="role-badge" [ngClass]="u.role">{{ u.role | titlecase }}</span></td>
+            <td>{{ u.createdAt | date:'mediumDate' }}</td>
+            <td>
+              <div class="action-btns" *ngIf="u.email !== userEmail">
+                <button class="icon-btn" title="Edit Role" (click)="openEdit(u)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                </button>
+                <button class="icon-btn" title="Delete" (click)="onDelete(u)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                </button>
+              </div>
+              <span class="muted" *ngIf="u.email === userEmail">Current user</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #empty>
+        <div class="empty-state"><p>No users found.</p></div>
+      </ng-template>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
+  <div class="user-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ editing ? 'Edit User Role' : 'Add User' }}</h2>
+      <button class="btn-close" (click)="closeForm()">&times;</button>
+    </div>
+    <form (ngSubmit)="onSave()" class="modal-form">
+      <div class="form-group" *ngIf="!editing">
+        <label>Username <span class="req">*</span></label>
+        <input type="text" [(ngModel)]="form.username" name="username" required placeholder="e.g. johndoe" />
+      </div>
+      <div class="form-group" *ngIf="!editing">
+        <label>Email <span class="req">*</span></label>
+        <input type="email" [(ngModel)]="form.email" name="email" required placeholder="e.g. user@hotel.com" />
+      </div>
+      <div class="form-group" *ngIf="!editing">
+        <label>Password <span class="req">*</span></label>
+        <input type="password" [(ngModel)]="form.password" name="password" required placeholder="Enter password" />
+      </div>
+      <div class="form-group">
+        <label>Role <span class="req">*</span></label>
+        <select [(ngModel)]="form.role" name="role" required>
+          <option value="staff">Staff</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <p class="error-msg" *ngIf="formError">{{ formError }}</p>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving">
+          {{ saving ? 'Saving...' : (editing ? 'Update Role' : 'Add User') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

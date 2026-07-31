@@ -1,0 +1,100 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Booking Report</h1>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="exportCSV()">Export CSV</button>
+      <button class="btn btn-secondary" (click)="exportJSON()">Export JSON</button>
+    </div>
+  </div>
+
+  <div class="range-tabs">
+    <button class="range-btn" [class.active]="activeRange === 'daily'" (click)="setRange('daily')">Daily</button>
+    <button class="range-btn" [class.active]="activeRange === 'weekly'" (click)="setRange('weekly')">Weekly</button>
+    <button class="range-btn" [class.active]="activeRange === 'monthly'" (click)="setRange('monthly')">Monthly</button>
+  </div>
+
+  <div class="date-range">
+    <div class="form-group">
+      <label>From</label>
+      <input type="date" [(ngModel)]="fromDate" (change)="load()" />
+    </div>
+    <div class="form-group">
+      <label>To</label>
+      <input type="date" [(ngModel)]="toDate" (change)="load()" />
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <span class="stat-value">{{ totalBookings }}</span>
+      <span class="stat-label">Total Bookings</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ totalRevenue | currency }}</span>
+      <span class="stat-label">Total Revenue</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ totalCheckedOut }}</span>
+      <span class="stat-label">Checked Out</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ totalCancelled }}</span>
+      <span class="stat-label">Cancelled</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>{{ activeRange === 'daily' ? 'Daily' : activeRange === 'weekly' ? 'Weekly' : 'Monthly' }} Breakdown</h2>
+    </div>
+    <div class="table-wrap">
+      <div class="loading-shade" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Loading report...</p>
+      </div>
+      <table *ngIf="!loading && filteredPeriods.length; else empty">
+        <thead>
+          <tr>
+            <th>{{ activeRange === 'daily' ? 'Date' : activeRange === 'weekly' ? 'Week' : 'Month' }}</th>
+            <th>Bookings</th>
+            <th>Revenue</th>
+            <th>Confirmed</th>
+            <th>Checked In</th>
+            <th>Checked Out</th>
+            <th>Cancelled</th>
+            <th>Pending</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of filteredPeriods">
+            <td><strong>{{ periodLabel(p._id) }}</strong></td>
+            <td>{{ p.count }}</td>
+            <td>{{ p.totalRevenue | currency }}</td>
+            <td>{{ p.confirmed }}</td>
+            <td>{{ p.checkedIn }}</td>
+            <td>{{ p.checkedOut }}</td>
+            <td><span class="cancelled">{{ p.cancelled }}</span></td>
+            <td>{{ p.pending }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td><strong>Total</strong></td>
+            <td><strong>{{ totalBookings }}</strong></td>
+            <td><strong>{{ totalRevenue | currency }}</strong></td>
+            <td></td>
+            <td></td>
+            <td><strong>{{ totalCheckedOut }}</strong></td>
+            <td><strong>{{ totalCancelled }}</strong></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+      <ng-template #empty>
+        <div class="empty-state">
+          <p>{{ loading ? '' : 'No bookings found for the selected period.' }}</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

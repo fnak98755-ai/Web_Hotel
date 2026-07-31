@@ -1,0 +1,105 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Services</h1>
+    <button class="btn btn-primary" (click)="openAdd()">+ Add Service</button>
+  </div>
+
+  <div class="card" *ngIf="showForm">
+    <div class="card-header">
+      <h2>{{ editing ? 'Edit Service' : 'Add Service' }}</h2>
+      <button class="btn-close" (click)="closeForm()">&times;</button>
+    </div>
+    <form (ngSubmit)="onSave()" class="service-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Name <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="form.name" name="name" placeholder="Service name" required />
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select [(ngModel)]="form.category" name="category">
+            <option value="">Select category...</option>
+            <option value="food">Food</option>
+            <option value="transport">Transport</option>
+            <option value="spa">Spa</option>
+            <option value="laundry">Laundry</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Price <span class="req">*</span></label>
+          <input type="number" [(ngModel)]="form.price" name="price" min="0.01" step="0.01" placeholder="0.00" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea [(ngModel)]="form.description" name="description" rows="3" placeholder="Service description..."></textarea>
+      </div>
+      <p class="error-msg" *ngIf="formError">{{ formError }}</p>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving">
+          {{ saving ? 'Saving...' : (editing ? 'Update Service' : 'Add Service') }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>Service List</h2>
+      <div class="filter-bar">
+        <select [(ngModel)]="categoryFilter" (change)="applyFilter()">
+          <option value="">All Categories</option>
+          <option value="food">Food</option>
+          <option value="transport">Transport</option>
+          <option value="spa">Spa</option>
+          <option value="laundry">Laundry</option>
+          <option value="other">Other</option>
+        </select>
+        <input type="text" [(ngModel)]="searchTerm" (input)="applyFilter()" placeholder="Search service..." />
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table *ngIf="filtered.length; else empty">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of filtered">
+            <td><strong>{{ s.name }}</strong></td>
+            <td>
+              <span class="cat-badge" *ngIf="s.category; else noCat" [ngClass]="s.category">{{ s.category }}</span>
+              <ng-template #noCat><span class="muted">---</span></ng-template>
+            </td>
+            <td>{{ s.price | currency }}</td>
+            <td>{{ s.description || '---' }}</td>
+            <td>
+              <div class="action-btns">
+                <button class="icon-btn" title="Edit" (click)="openEdit(s)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                </button>
+                <button class="icon-btn" title="Delete" (click)="onDelete(s)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #empty>
+        <div class="empty-state">
+          <p>{{ services.length ? 'No services match your filter.' : 'No services yet. Add your first service!' }}</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

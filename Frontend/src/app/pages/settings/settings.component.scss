@@ -1,0 +1,43 @@
+.page { padding: 24px; }
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.page-header h1 { margin: 0; font-size: 24px; color: #1a1d29; }
+
+.settings-layout { max-width: 720px; }
+
+.card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 24px; overflow: hidden; }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid #f0f0f0; }
+.card-header h2 { margin: 0; font-size: 16px; color: #1a1d29; }
+.card-body { padding: 24px; }
+.loading-body { text-align: center; color: #999; }
+
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.info-item { display: flex; flex-direction: column; gap: 4px; }
+.info-item.full-width { grid-column: 1 / -1; }
+.info-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #888; font-weight: 600; }
+.info-value { font-size: 15px; color: #1a1d29; font-weight: 500; }
+
+.settings-form { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.form-row { display: flex; gap: 16px; }
+.form-row .form-group { flex: 1; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 13px; font-weight: 600; color: #555; }
+.req { color: #e53935; }
+.form-group input, .form-group select, .form-group textarea {
+  padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;
+  font-family: inherit;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #ff6b35; }
+.form-group textarea { resize: vertical; min-height: 60px; }
+.form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+.error-msg { color: #e53935; font-size: 13px; text-align: center; margin: 0; }
+
+.btn {
+  padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn:hover:not(:disabled) { opacity: 0.85; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: #ff6b35; color: #fff; }
+.btn-secondary { background: #f0f0f0; color: #555; }
+
+.empty-state { margin: 0; font-size: 14px; color: #999; }
