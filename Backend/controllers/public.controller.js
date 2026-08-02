@@ -41,24 +41,34 @@ exports.getRoomById = async (req, res) => {
         if (!room) return res.status(404).json({ error: 'Room not found' });
 
         const { checkIn, checkOut } = req.query;
-        let isBooked = false;
 
+        const query = {
+            room: room._id,
+            status: { $nin: ['cancelled'] },
+        };
         if (checkIn && checkOut) {
             const ci = new Date(checkIn);
             const co = new Date(checkOut);
-            const conflict = await Booking.findOne({
-                room: room._id,
-                status: { $nin: ['cancelled', 'checked_out'] },
-                $or: [
-                    { checkIn: { $lt: co }, checkOut: { $gt: ci } }
-                ]
-            });
-            isBooked = !!conflict;
+            query.$or = [
+                { checkIn: { $lt: co }, checkOut: { $gt: ci } }
+            ];
+        }
+
+        const booking = await Booking.findOne(query).sort({ createdAt: -1 });
+
+        let availability = 'available';
+        if (!room.isAvailable) {
+            availability = 'unavailable';
+        } else if (booking) {
+            availability = booking.status === 'checked_in' ? 'checked_in'
+                : booking.status === 'checked_out' ? 'checked_out'
+                : 'booked';
         }
 
         res.json({
             ...room.toObject(),
-            availability: !room.isAvailable || isBooked ? 'booked' : 'available',
+            availability,
+            currentStatus: booking ? booking.status : null,
         });
     } catch (err) {
         res.status(500).json({ error: err.message });

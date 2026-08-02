@@ -34,13 +34,16 @@ import { CustomerBookingService } from '../../services/customer-booking.service'
               <span class="dh-div">|</span>
               <span class="dh-price">{{ '$' + room.pricePerNight }}<small>/ night</small></span>
               <span class="dh-div">|</span>
-              <span class="dh-status" [class.available]="room.availability === 'available'" [class.booked]="room.availability === 'booked'">{{ room.availability === 'available' ? 'Available' : 'Booked' }}</span>
+              <span class="dh-status" [class.available]="room.availability === 'available'" [class.booked]="room.availability === 'booked'" [class.checked-in]="room.availability === 'checked_in'" [class.checked-out]="room.availability === 'checked_out'" [class.unavailable]="room.availability === 'unavailable'">{{ statusLabel() }}</span>
             </div>
           </div>
         </div>
 
         <div class="detail-body">
           <div class="detail-main">
+            <div class="d-photo">
+              <img [src]="roomImage(room)" alt="Room {{ room.roomNumber }}" />
+            </div>
             <div class="d-section" *ngIf="room.description">
               <h3>About This Room</h3>
               <p>{{ room.description }}</p>
@@ -59,7 +62,7 @@ import { CustomerBookingService } from '../../services/customer-booking.service'
           <div class="detail-side">
             <div class="side-card" *ngIf="auth.isLoggedIn(); else loginCard">
               <h3>Reserve Your Stay</h3>
-              <p class="booked-msg" *ngIf="room.availability === 'booked'">Room is already booked for the selected dates. Please choose different dates.</p>
+              <p class="booked-msg" *ngIf="isBlocked()">Room is already booked for the selected dates. Please choose different dates.</p>
               <div class="sc-field">
                 <label>Check-In</label>
                 <input type="date" [(ngModel)]="checkIn" [min]="today" (change)="onDateChange()" />
@@ -81,7 +84,7 @@ import { CustomerBookingService } from '../../services/customer-booking.service'
                 <strong>{{ '$' + calculateTotal() }}</strong>
               </div>
               <p class="sc-error" *ngIf="error">{{ error }}</p>
-              <button class="sc-btn" (click)="book()" [disabled]="submitting || room.availability === 'booked'">
+              <button class="sc-btn" (click)="book()" [disabled]="submitting || isBlocked()">
                 {{ submitting ? 'Processing...' : 'Confirm Booking' }}
               </button>
             </div>
@@ -135,6 +138,9 @@ import { CustomerBookingService } from '../../services/customer-booking.service'
     .dh-status { font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
     .dh-status.available { background: rgba(46,125,50,0.15); color: #2e7d32; }
     .dh-status.booked { background: rgba(229,57,53,0.15); color: #e53935; }
+    .dh-status.checked-in { background: rgba(251,140,0,0.15); color: #ef6c00; }
+    .dh-status.checked-out { background: rgba(90,90,90,0.15); color: #616161; }
+    .dh-status.unavailable { background: rgba(120,120,120,0.15); color: #757575; }
 
     .detail-body { max-width: 1200px; margin: 0 auto; padding: 40px 24px 60px; display: grid; grid-template-columns: 1fr 380px; gap: 40px; align-items: start; }
     .d-section { margin-bottom: 36px; }
@@ -147,6 +153,8 @@ import { CustomerBookingService } from '../../services/customer-booking.service'
     .detail-side { position: sticky; top: 88px; }
     .side-card { background: #fff; border-radius: 5px; padding: 28px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); border: 1px solid #f0f0f0; }
     .side-card h3 { font-size: 18px; font-weight: 700; color: #0a0c12; margin-bottom: 20px; }
+    .d-photo { border-radius: 5px; overflow: hidden; margin-bottom: 36px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+    .d-photo img { width: 100%; height: 320px; object-fit: cover; display: block; }
     .sc-field { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
     .sc-field label { font-size: 12px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.3px; }
     .sc-field input, .sc-field textarea { padding: 11px 14px; border: 1px solid #e5e5e5; border-radius: 5px; font-size: 14px; outline: none; transition: all 0.2s; background: #fafafa; }
@@ -173,6 +181,7 @@ import { CustomerBookingService } from '../../services/customer-booking.service'
     .footer { background: #0a0c12; color: #666; text-align: center; padding: 24px; font-size: 13px; }
     @media (max-width: 768px) {
       .detail-body { grid-template-columns: 1fr; }
+      .d-photo img { height: 220px; }
       .dh-info { padding: 24px 20px; }
       .dh-info h1 { font-size: 28px; }
       .dh-meta { flex-wrap: wrap; }
@@ -236,6 +245,20 @@ export class RoomDetailComponent implements OnInit {
   calculateNights(): number {
     if (!this.checkIn || !this.checkOut) return 0;
     return Math.ceil((new Date(this.checkOut).getTime() - new Date(this.checkIn).getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  statusLabel(): string {
+    const a = this.room?.availability;
+    if (a === 'available') return 'Available';
+    if (a === 'checked_in') return 'Checked In';
+    if (a === 'checked_out') return 'Checked Out';
+    if (a === 'unavailable') return 'Unavailable';
+    return 'Booked';
+  }
+
+  isBlocked(): boolean {
+    const a = this.room?.availability;
+    return a === 'booked' || a === 'checked_in' || a === 'unavailable';
   }
 
   calculateTotal(): number {
