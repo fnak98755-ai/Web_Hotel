@@ -12,7 +12,7 @@ export interface PublicRoom {
   amenities: string[];
   isAvailable: boolean;
   images: string[];
-  availability: 'available' | 'booked';
+  availability: 'available' | 'booked' | 'checked_in' | 'checked_out' | 'unavailable';
 }
 
 export interface HotelInfo {
