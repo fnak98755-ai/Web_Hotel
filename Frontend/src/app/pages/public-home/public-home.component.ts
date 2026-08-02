@@ -284,7 +284,11 @@ import { Router } from '@angular/router';
       .load-skeleton { grid-template-columns: 1fr; }
     }
     @media (max-width: 768px) {
+      .nav-inner { padding: 0 16px; height: 60px; }
+      .brand-text { font-size: 16px; }
       .nav-btn { padding: 6px 12px; font-size: 11px; }
+      .hero { padding: 120px 0 60px; }
+      .hero-sub { font-size: 14px; margin-bottom: 20px; }
       .hero-search { flex-direction: column; padding: 12px; border-radius: 5px; }
       .hs-divider { display: none; }
       .hs-field { padding: 6px 10px; width: 100%; }
@@ -292,6 +296,16 @@ import { Router } from '@angular/router';
       .stats-bar { flex-wrap: wrap; margin-top: -20px; gap: 2px; }
       .stat { min-width: 48%; border-radius: 5px; }
       .grid { grid-template-columns: 1fr; }
+      .rooms { margin: 48px auto 60px; padding: 0 16px; }
+      .section-header h2 { font-size: 26px; }
+    }
+    @media (max-width: 420px) {
+      .navbar { overflow-x: auto; }
+      .hero-content { padding: 0 16px; }
+      .hero-content h1 { font-size: 30px; }
+      .stat { padding: 18px 10px; }
+      .stat-num { font-size: 22px; }
+      .card-body { padding: 18px 16px 14px; }
     }
   `]
 })

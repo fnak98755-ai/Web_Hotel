@@ -127,6 +127,25 @@ import { Router } from '@angular/router';
     .empty-state a { color: #d4a853; text-decoration: none; font-weight: 600; }
     .empty-state a:hover { text-decoration: underline; }
     .footer { background: #0a0c12; color: #666; text-align: center; padding: 24px; font-size: 13px; }
+    @media (max-width: 768px) {
+      .nav-inner { padding: 0 16px; height: 60px; }
+      .bookings-wrap { padding: 100px 16px 48px; }
+      .page-head h1 { font-size: 26px; }
+      .b-card { padding: 20px 16px; }
+      .b-dates { flex-wrap: wrap; gap: 12px 16px; }
+      .b-date { flex: 1 1 40%; }
+      .b-arrow { display: none; }
+      .b-total { flex-basis: 100%; text-align: left; }
+      .user-badge { display: none; }
+    }
+    @media (max-width: 420px) {
+      .navbar { overflow-x: auto; }
+      .b-head { align-items: flex-start; gap: 10px; }
+      .b-status { padding: 3px 10px; font-size: 10px; }
+      .b-avatar { width: 38px; height: 38px; }
+      .b-room-num { font-size: 14px; }
+      .bd-value { font-size: 13px; }
+    }
   `]
 })
 export class CustomerBookingsComponent implements OnInit {

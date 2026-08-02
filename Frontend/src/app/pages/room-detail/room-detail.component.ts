@@ -180,13 +180,26 @@ import { CustomerBookingService } from '../../services/customer-booking.service'
 
     .footer { background: #0a0c12; color: #666; text-align: center; padding: 24px; font-size: 13px; }
     @media (max-width: 768px) {
-      .detail-body { grid-template-columns: 1fr; }
-      .d-photo img { height: 220px; }
-      .dh-info { padding: 24px 20px; }
-      .dh-info h1 { font-size: 28px; }
-      .dh-meta { flex-wrap: wrap; }
+      .nav-inner { padding: 0 16px; height: 60px; }
+      .detail-hero { height: 260px; margin-top: 60px; }
+      .detail-body { grid-template-columns: 1fr; padding: 24px 16px 48px; gap: 24px; }
+      .d-photo img { height: 200px; }
+      .detail-side { position: static; }
+      .side-card { padding: 22px 18px; }
+      .dh-info { padding: 20px 16px; }
+      .dh-info h1 { font-size: 26px; }
+      .dh-meta { flex-wrap: wrap; gap: 8px; }
+      .dh-meta span { font-size: 13px; }
+      .dh-price { font-size: 18px; }
       .amenities-grid { grid-template-columns: 1fr; }
       .nav-btn { padding: 6px 12px; font-size: 11px; }
+    }
+    @media (max-width: 420px) {
+      .navbar { overflow-x: auto; }
+      .back-btn span { font-size: 12px; }
+      .sc-btn { padding: 14px; font-size: 14px; }
+      .sc-field input, .sc-field textarea { font-size: 15px; }
+      .d-section h3, .side-card h3 { font-size: 16px; }
     }
   `]
 })
