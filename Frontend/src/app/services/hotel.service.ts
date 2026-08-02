@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface Hotel {
   _id: string;
@@ -19,7 +20,7 @@ export interface Hotel {
 
 @Injectable({ providedIn: 'root' })
 export class HotelService {
-  private api = 'http://localhost:3000/api/hotel';
+  private api = `${environment.apiUrl}/hotel`;
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 

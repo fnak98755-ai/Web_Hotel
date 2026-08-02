@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface Customer {
   _id: string;
@@ -16,7 +17,7 @@ export interface Customer {
 
 @Injectable({ providedIn: 'root' })
 export class CustomerService {
-  private api = 'http://localhost:3000/api/customers';
+  private api = `${environment.apiUrl}/customers`;
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 

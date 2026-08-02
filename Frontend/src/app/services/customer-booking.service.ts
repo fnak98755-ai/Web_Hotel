@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface CustomerBooking {
   _id: string;
@@ -17,7 +18,7 @@ export interface CustomerBooking {
 
 @Injectable({ providedIn: 'root' })
 export class CustomerBookingService {
-  private api = 'http://localhost:3000/api/bookings';
+  private api = `${environment.apiUrl}/bookings`;
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 

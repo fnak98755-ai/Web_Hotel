@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { ConfirmDialogService } from '../../services/confirm-dialog.service';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 interface AppUser {
   _id: string;
@@ -29,7 +30,7 @@ export class UserComponent implements OnInit {
 
   form: any = { username: '', email: '', password: '', role: 'staff' };
 
-  private api = 'http://localhost:3000/api/users';
+  private api = `${environment.apiUrl}/users`;
 
   constructor(private auth: AuthService, private http: HttpClient, private confirm: ConfirmDialogService) {}
 

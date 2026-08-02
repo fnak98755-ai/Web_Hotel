@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface PublicRoom {
   _id: string;
@@ -26,7 +27,7 @@ export interface HotelInfo {
 
 @Injectable({ providedIn: 'root' })
 export class PublicService {
-  private api = 'http://localhost:3000/api/public';
+  private api = `${environment.apiUrl}/public`;
 
   constructor(private http: HttpClient) {}
 

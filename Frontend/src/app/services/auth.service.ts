@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface User {
   id: string;
@@ -15,11 +16,11 @@ export interface LoginResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/api/users';
+  private apiUrl = `${environment.apiUrl}/users`;
 
   constructor(private http: HttpClient) {}
 
-  private publicApi = 'http://localhost:3000/api/public';
+  private publicApi = `${environment.apiUrl}/public`;
 
   register(username: string, email: string, password: string): Observable<any> {
     return this.http.post(`${this.publicApi}/register`, { username, email, password });
