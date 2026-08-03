@@ -1,5 +1,23 @@
 const User = require('../models/User');
+const Employee = require('../models/Employee');
 const jwt = require('jsonwebtoken');
+
+async function syncEmployee(user) {
+    if (user.role === 'customer') {
+        await Employee.deleteOne({ email: user.email });
+        return;
+    }
+    const exists = await Employee.findOne({ email: user.email });
+    if (!exists) {
+        await Employee.create({
+            name: user.username,
+            email: user.email,
+            position: user.role === 'admin' ? 'Manager' : 'Staff',
+            department: 'Front Office',
+            isActive: true,
+        });
+    }
+}
 
 exports.getAll = async (req, res) => {
     try {
@@ -23,6 +41,14 @@ exports.getById = async (req, res) => {
 exports.create = async (req, res) => {
     try {
         const user = await User.create(req.body);
+        if (user.role !== 'customer') {
+            try {
+                await syncEmployee(user);
+            } catch (err) {
+                await User.findByIdAndDelete(user._id);
+                return res.status(400).json({ error: `User created but employee record failed: ${err.message}` });
+            }
+        }
         res.status(201).json(user);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -33,6 +59,11 @@ exports.update = async (req, res) => {
     try {
         const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
         if (!user) return res.status(404).json({ error: 'User not found' });
+        try {
+            await syncEmployee(user);
+        } catch (err) {
+            return res.status(400).json({ error: `User updated but employee sync failed: ${err.message}` });
+        }
         res.json(user);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -43,6 +74,7 @@ exports.remove = async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
         if (!user) return res.status(404).json({ error: 'User not found' });
+        await Employee.deleteOne({ email: user.email });
         res.json({ message: 'User deleted' });
     } catch (err) {
         res.status(500).json({ error: err.message });
