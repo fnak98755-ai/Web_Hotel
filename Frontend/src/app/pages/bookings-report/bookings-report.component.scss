@@ -77,4 +77,5 @@ tfoot td { border-top: 2px solid #1a1d29; background: #fafafa; font-size: 14px; 
   .range-btn { flex: 1; padding: 8px 12px; text-align: center; }
   .date-range { flex-wrap: wrap; gap: 12px; }
   .table-wrap { -webkit-overflow-scrolling: touch; }
+  .table-wrap table { min-width: 720px; }
 }

@@ -112,6 +112,10 @@ tr:hover td { background: #fafafa; }
   .filter-bar input { width: 100%; }
   .filter-bar select { flex: 1; min-width: 0; }
   .table-wrap { -webkit-overflow-scrolling: touch; }
+  .table-wrap table { min-width: 820px; }
+  th, td { padding: 10px 12px; }
+  .modal { max-height: 85vh; }
+  .modal-header h2 { word-break: break-word; }
   .modal-body { padding: 16px; }
   .add-service-row { flex-direction: column; }
   .qty-input { width: 100%; }

@@ -156,5 +156,6 @@ tr:hover td { background: #fafafa; }
   .filter-bar input { width: 100%; }
   .filter-bar select { flex: 1; min-width: 0; }
   .table-wrap { -webkit-overflow-scrolling: touch; }
+  .table-wrap table { min-width: 720px; }
   .receipt-modal { padding: 24px 14px; }
 }

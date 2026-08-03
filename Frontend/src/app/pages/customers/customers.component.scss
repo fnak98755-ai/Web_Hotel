@@ -79,4 +79,5 @@ tr:hover td { background: #fafafa; }
   .filter-bar { flex-wrap: wrap; }
   .filter-bar input { width: 100%; }
   .table-wrap { -webkit-overflow-scrolling: touch; }
+  .table-wrap table { min-width: 640px; }
 }
