@@ -1,11 +1,13 @@
 {
   "version": 2,
   "framework": null,
-  "installCommand": "",
+  "installCommand": "npm install",
   "buildCommand": "npm run build",
   "outputDirectory": "Frontend/dist/frontend/browser",
   "cleanUrls": true,
   "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/api", "destination": "/api/index" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
