@@ -10,9 +10,9 @@ export interface PublicRoom {
   pricePerNight: number;
   capacity: number;
   description?: string;
-  amenities: string[];
+  amenities?: string[];
   isAvailable: boolean;
-  images: string[];
+  images?: string[];
   availability: 'available' | 'booked' | 'checked_in' | 'checked_out' | 'unavailable';
 }
 

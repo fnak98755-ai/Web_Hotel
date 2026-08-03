@@ -63,3 +63,13 @@ tr:hover td { background: #fafafa; }
 .error-msg { color: #e53935; font-size: 13px; text-align: center; margin: 0; }
 .empty-state { text-align: center; padding: 48px 24px; color: #999; }
 .empty-state p { margin: 0; font-size: 14px; }
+
+@media (max-width: 768px) {
+  .page { padding: 12px; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .page-header h1 { font-size: 20px; }
+  .card-header { padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
+  .profile-body { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .form-actions { flex-wrap: wrap; }
+  .table-wrap { -webkit-overflow-scrolling: touch; }
+}

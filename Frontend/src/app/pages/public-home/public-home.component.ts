@@ -80,8 +80,8 @@ import { Router } from '@angular/router';
               </div>
               <p class="card-desc" *ngIf="room.description">{{ room.description }}</p>
               <div class="card-tags" *ngIf="room.amenities?.length">
-                <span class="tag" *ngFor="let a of room.amenities.slice(0,4)">{{ a }}</span>
-                <span class="tag more" *ngIf="room.amenities.length > 4">+{{ room.amenities.length - 4 }}</span>
+                <span class="tag" *ngFor="let a of (room.amenities || []).slice(0,4)">{{ a }}</span>
+                <span class="tag more" *ngIf="(room.amenities || []).length > 4">+{{ (room.amenities || []).length - 4 }}</span>
               </div>
             </div>
             <button class="card-cta" [class.disabled]="room.availability === 'booked'">{{ room.availability === 'booked' ? 'Not Available' : 'Book Now' }} <span *ngIf="room.availability === 'available'">&#8594;</span></button>

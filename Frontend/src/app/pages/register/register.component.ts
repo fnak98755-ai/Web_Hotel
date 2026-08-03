@@ -87,6 +87,13 @@ import { Router } from '@angular/router';
     .reg-footer { text-align: center; font-size: 13px; color: #888; margin-top: 24px; }
     .reg-footer a { color: #d4a853; text-decoration: none; font-weight: 600; }
     .reg-footer a:hover { text-decoration: underline; }
+    @media (max-width: 768px) {
+      .nav-inner { padding: 0 16px; height: 60px; }
+      .nav-btn { padding: 6px 12px; font-size: 11px; }
+      .reg-wrap { padding: 84px 16px 32px; }
+      .reg-card { padding: 32px 20px; }
+      .navbar { overflow-x: auto; }
+    }
   `]
 })
 export class RegisterComponent {

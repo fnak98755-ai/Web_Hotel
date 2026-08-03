@@ -6,8 +6,8 @@ import { environment } from '../../environments/environment';
 
 export interface CustomerBooking {
   _id: string;
-  customer: { _id: string; name: string; email: string };
-  room: { _id: string; roomNumber: string; type: string; pricePerNight: number };
+  customer: { _id: string; name: string; email: string } | null;
+  room: { _id: string; roomNumber: string; type: string; pricePerNight: number } | null;
   checkIn: string;
   checkOut: string;
   totalAmount: number;

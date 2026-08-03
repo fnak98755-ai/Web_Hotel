@@ -1,16 +1,34 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from '../services/auth.service';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss']
 })
-export class LayoutComponent {
+export class LayoutComponent implements OnInit, OnDestroy {
   sidebarExpanded = true;
+  sidebarOpen = false;
+  private navSub!: Subscription;
 
   constructor(private auth: AuthService, private router: Router) {}
+
+  ngOnInit() {
+    this.navSub = this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(() => this.sidebarOpen = false);
+  }
+
+  ngOnDestroy() {
+    if (this.navSub) this.navSub.unsubscribe();
+  }
+
+  toggleSidebar() {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
 
   get user() {
     return this.auth.getUser();

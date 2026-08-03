@@ -63,3 +63,18 @@ tfoot td { border-top: 2px solid #1a1d29; background: #fafafa; font-size: 14px; 
 
 .empty-state { text-align: center; padding: 48px 24px; color: #999; }
 .empty-state p { margin-top: 16px; font-size: 14px; }
+
+@media (max-width: 768px) {
+  .page { padding: 12px; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .page-header h1 { font-size: 20px; }
+  .header-actions { flex-wrap: wrap; }
+  .card-header { padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
+  .stats { flex-wrap: wrap; gap: 10px; }
+  .stat-card { flex: 1 1 45%; padding: 14px 10px; }
+  .stat-value { font-size: 22px; }
+  .range-tabs { flex-wrap: wrap; }
+  .range-btn { flex: 1; padding: 8px 12px; text-align: center; }
+  .date-range { flex-wrap: wrap; gap: 12px; }
+  .table-wrap { -webkit-overflow-scrolling: touch; }
+}

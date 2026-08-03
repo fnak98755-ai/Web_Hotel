@@ -127,6 +127,11 @@ import { Router } from '@angular/router';
       opacity: 0.6;
       cursor: not-allowed;
     }
+    @media (max-width: 768px) {
+      .login-card {
+        padding: 32px 20px;
+      }
+    }
   `]
 })
 export class LoginComponent {

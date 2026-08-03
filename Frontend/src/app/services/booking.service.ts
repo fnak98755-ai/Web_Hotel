@@ -30,8 +30,8 @@ export interface BookedService {
 
 export interface Booking {
   _id: string;
-  customer: Customer;
-  room: Room;
+  customer: Customer | null;
+  room: Room | null;
   checkIn: string;
   checkOut: string;
   status: string;

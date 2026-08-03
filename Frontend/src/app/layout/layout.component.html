@@ -1,5 +1,6 @@
 <div class="layout">
-  <aside class="sidebar" [class.collapsed]="!sidebarExpanded">
+  <div class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="toggleSidebar()"></div>
+  <aside class="sidebar" [class.collapsed]="!sidebarExpanded" [class.open]="sidebarOpen">
     <div class="brand">
       <span class="brand-name">SETEC</span>
       <span class="brand-sub">Hotel_Booking_System</span>
@@ -126,6 +127,11 @@
   </aside>
 
   <main class="main-content">
+    <button class="menu-toggle" (click)="toggleSidebar()" aria-label="Toggle menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
     <router-outlet />
   </main>
 </div>

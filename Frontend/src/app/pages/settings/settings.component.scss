@@ -41,3 +41,14 @@
 .btn-secondary { background: #f0f0f0; color: #555; }
 
 .empty-state { margin: 0; font-size: 14px; color: #999; }
+
+@media (max-width: 768px) {
+  .page { padding: 12px; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .page-header h1 { font-size: 20px; }
+  .card-header { padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
+  .card-body { padding: 16px; }
+  .info-grid { grid-template-columns: 1fr; gap: 14px; }
+  .form-row { flex-direction: column; gap: 12px; }
+  .form-actions { flex-wrap: wrap; }
+}
