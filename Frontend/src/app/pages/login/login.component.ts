@@ -161,7 +161,15 @@ export class LoginComponent {
         }
       },
       error: (err) => {
-        this.error = err.error?.error || 'Login failed. Please try again.';
+        if (err.status === 0) {
+          this.error = 'Cannot reach the server. Check your internet connection.';
+        } else if (err.error?.error) {
+          this.error = err.error.error;
+        } else if (err.status === 504 || err.status === 502) {
+          this.error = 'Server took too long to respond (cold start). Please try again.';
+        } else {
+          this.error = `Login failed (HTTP ${err.status || 'unknown'}). Please try again.`;
+        }
         this.loading = false;
       }
     });

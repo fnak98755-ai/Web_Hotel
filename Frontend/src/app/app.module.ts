@@ -21,7 +21,7 @@ import { PublicHomeComponent } from './pages/public-home/public-home.component';
 import { RoomDetailComponent } from './pages/room-detail/room-detail.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { CustomerBookingsComponent } from './pages/customer-bookings/customer-bookings.component';
-import { authInterceptor } from './services/auth.interceptor';
+import { AuthInterceptor } from './services/auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -50,7 +50,7 @@ import { authInterceptor } from './services/auth.interceptor';
     FormsModule
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useValue: authInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })
