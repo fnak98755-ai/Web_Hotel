@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Employee = require('../models/Employee');
 const jwt = require('jsonwebtoken');
+const JWT_SECRET = require('../config/jwt');
 
 async function syncEmployee(user) {
     if (user.role === 'customer') {
@@ -100,7 +101,7 @@ exports.login = async (req, res) => {
 
         const token = jwt.sign(
             { id: user._id, email: user.email, role: user.role },
-            process.env.JWT_SECRET,
+            JWT_SECRET,
             { expiresIn: '24h' }
         );
 
