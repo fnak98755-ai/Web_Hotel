@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CustomerService, Customer } from '../../services/customer.service';
 import { ConfirmDialogService } from '../../services/confirm-dialog.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-customers',
@@ -19,7 +20,15 @@ export class CustomersComponent implements OnInit {
 
   form: any = { name: '', email: '', phone: '', address: '', idType: '', idNumber: '' };
 
-  constructor(private service: CustomerService, private confirm: ConfirmDialogService) {}
+  constructor(
+    private service: CustomerService,
+    private confirm: ConfirmDialogService,
+    private auth: AuthService
+  ) {}
+
+  get canCreate() { return this.auth.canAction('customers', 'create'); }
+  get canUpdate() { return this.auth.canAction('customers', 'update'); }
+  get canDelete() { return this.auth.canAction('customers', 'delete'); }
 
   ngOnInit() {
     this.load();

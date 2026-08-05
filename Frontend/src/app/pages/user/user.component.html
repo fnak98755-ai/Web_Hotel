@@ -28,6 +28,7 @@
             <th>Username</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Permissions</th>
             <th>Created</th>
             <th>Actions</th>
           </tr>
@@ -37,6 +38,11 @@
             <td><strong>{{ u.username }}</strong></td>
             <td>{{ u.email }}</td>
             <td><span class="role-badge" [ngClass]="u.role">{{ u.role | titlecase }}</span></td>
+            <td>
+              <span class="muted" *ngIf="u.role === 'admin'">All access</span>
+              <span class="perm-chip" *ngFor="let p of permLabels(u.permissions)">{{ p }}</span>
+              <span class="muted" *ngIf="u.role === 'staff' && !permLabels(u.permissions).length">No access</span>
+            </td>
             <td>{{ u.createdAt | date:'mediumDate' }}</td>
             <td>
               <div class="action-btns" *ngIf="u.email !== userEmail">
@@ -62,7 +68,7 @@
 <div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
   <div class="user-modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>{{ editing ? 'Edit User Role' : 'Add User' }}</h2>
+      <h2>{{ editing ? 'Edit User' : 'Add User' }}</h2>
       <button class="btn-close" (click)="closeForm()">&times;</button>
     </div>
     <form (ngSubmit)="onSave()" class="modal-form">
@@ -85,11 +91,29 @@
           <option value="admin">Admin</option>
         </select>
       </div>
+      <div class="form-group" *ngIf="form.role === 'staff'">
+        <label>Permissions</label>
+        <p class="hint">Staff can only access the modules and actions you check. Leave all empty for login-only access.</p>
+        <div class="perm-group" *ngFor="let m of permOptions">
+          <div class="perm-group-head">
+            <label class="perm-item">
+              <input type="checkbox" [checked]="permHas(m.key, 'view')" (change)="togglePerm(m.key, 'view')" />
+              <span><strong>{{ m.label }}</strong></span>
+            </label>
+          </div>
+          <div class="perm-actions" *ngIf="m.actions.length > 1">
+            <label class="perm-item" *ngFor="let a of m.actions.slice(1)">
+              <input type="checkbox" [checked]="permHas(m.key, a)" (change)="togglePerm(m.key, a)" />
+              <span>{{ a | titlecase }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
       <p class="error-msg" *ngIf="formError">{{ formError }}</p>
       <div class="form-actions">
         <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
         <button type="submit" class="btn btn-primary" [disabled]="saving">
-          {{ saving ? 'Saving...' : (editing ? 'Update Role' : 'Add User') }}
+          {{ saving ? 'Saving...' : (editing ? 'Save' : 'Add User') }}
         </button>
       </div>
     </form>

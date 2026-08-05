@@ -18,6 +18,9 @@ export class LayoutComponent implements OnInit, OnDestroy {
   constructor(private auth: AuthService, private router: Router, private confirm: ConfirmDialogService) {}
 
   ngOnInit() {
+    this.auth.refreshUser().subscribe({
+      error: () => this.auth.logout()
+    });
     this.navSub = this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(() => this.sidebarOpen = false);
@@ -37,6 +40,10 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   get isAdmin() {
     return this.auth.isAdmin();
+  }
+
+  can(perm: string): boolean {
+    return this.auth.hasPerm(perm);
   }
 
   logout() {

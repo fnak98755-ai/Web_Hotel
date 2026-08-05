@@ -1,7 +1,7 @@
 <div class="page">
   <div class="page-header">
     <h1>Employees</h1>
-    <button class="btn btn-primary" (click)="openAdd()">+ Add Employee</button>
+    <button class="btn btn-primary" *ngIf="canCreate" (click)="openAdd()">+ Add Employee</button>
   </div>
 
   <div class="stats">
@@ -121,13 +121,13 @@
             </td>
             <td>
               <div class="action-btns">
-                <button class="icon-btn" title="Edit" (click)="openEdit(e)">
+                <button class="icon-btn" title="Edit" *ngIf="canUpdate" (click)="openEdit(e)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                 </button>
-                <button class="icon-btn" [title]="e.isActive ? 'Deactivate' : 'Activate'" (click)="toggleStatus(e)">
+                <button class="icon-btn" *ngIf="canUpdate" [title]="e.isActive ? 'Deactivate' : 'Activate'" (click)="toggleStatus(e)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
                 </button>
-                <button class="icon-btn" title="Delete" (click)="onDelete(e)">
+                <button class="icon-btn" title="Delete" *ngIf="canDelete" (click)="onDelete(e)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                 </button>
               </div>

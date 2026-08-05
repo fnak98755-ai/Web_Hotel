@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RoomService, Room } from '../../services/room.service';
 import { ConfirmDialogService } from '../../services/confirm-dialog.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-rooms',
@@ -29,7 +30,15 @@ export class RoomsComponent implements OnInit {
     description: '', amenities: '', isAvailable: true
   };
 
-  constructor(private service: RoomService, private confirm: ConfirmDialogService) {}
+  constructor(
+    private service: RoomService,
+    private confirm: ConfirmDialogService,
+    private auth: AuthService
+  ) {}
+
+  get canCreate() { return this.auth.canAction('rooms', 'create'); }
+  get canUpdate() { return this.auth.canAction('rooms', 'update'); }
+  get canDelete() { return this.auth.canAction('rooms', 'delete'); }
 
   ngOnInit() {
     this.load();

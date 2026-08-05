@@ -1,7 +1,7 @@
 <div class="page">
   <div class="page-header">
     <h1>Payments</h1>
-    <button class="btn btn-primary" (click)="openAdd()">+ Record Payment</button>
+    <button class="btn btn-primary" *ngIf="canCreate" (click)="openAdd()">+ Record Payment</button>
   </div>
 
   <div class="stats">
@@ -140,7 +140,7 @@
       <p class="error-msg" *ngIf="formError">{{ formError }}</p>
       <div class="form-actions">
         <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
-        <button class="btn btn-primary" (click)="onUpdateStatus()" [disabled]="saving">
+        <button class="btn btn-primary" *ngIf="canUpdate" (click)="onUpdateStatus()" [disabled]="saving">
           {{ saving ? 'Saving...' : 'Update Status' }}
         </button>
       </div>
@@ -207,16 +207,16 @@
             </td>
             <td>
               <div class="action-btns">
-                <button class="icon-btn" *ngIf="p.status === 'pending'" title="Complete payment" (click)="completePayment(p)">
+                <button class="icon-btn" *ngIf="canUpdate && p.status === 'pending'" title="Complete payment" (click)="completePayment(p)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                 </button>
                 <button class="icon-btn" title="View receipt" (click)="viewReceipt(p)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>
                 </button>
-                <button class="icon-btn" title="Edit" (click)="openEdit(p)">
+                <button class="icon-btn" title="Edit" *ngIf="canUpdate" (click)="openEdit(p)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                 </button>
-                <button class="icon-btn" title="Delete" (click)="onDelete(p)">
+                <button class="icon-btn" title="Delete" *ngIf="canDelete" (click)="onDelete(p)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                 </button>
               </div>

@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/payment.controller');
 const auth = require('../middleware/auth');
-const role = require('../middleware/role');
+const perm = require('../middleware/perm');
 
-router.get('/', auth, role('admin', 'staff'), ctrl.getAll);
-router.get('/:id', auth, role('admin', 'staff'), ctrl.getById);
-router.post('/', auth, role('admin', 'staff'), ctrl.create);
-router.put('/:id', auth, role('admin', 'staff'), ctrl.update);
-router.delete('/:id', auth, role('admin'), ctrl.remove);
+router.get('/', auth, perm('payments'), ctrl.getAll);
+router.get('/:id', auth, perm('payments'), ctrl.getById);
+router.post('/', auth, perm('payments:create'), ctrl.create);
+router.put('/:id', auth, perm('payments:update'), ctrl.update);
+router.delete('/:id', auth, perm('payments:delete'), ctrl.remove);
 
 module.exports = router;

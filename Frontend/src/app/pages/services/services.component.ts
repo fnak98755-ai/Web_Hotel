@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ServiceService, Service } from '../../services/service.service';
 import { ConfirmDialogService } from '../../services/confirm-dialog.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-services',
@@ -22,7 +23,15 @@ export class ServicesComponent implements OnInit {
 
   form: any = { name: '', category: '', price: null, description: '' };
 
-  constructor(private service: ServiceService, private confirm: ConfirmDialogService) {}
+  constructor(
+    private service: ServiceService,
+    private confirm: ConfirmDialogService,
+    private auth: AuthService
+  ) {}
+
+  get canCreate() { return this.auth.canAction('services', 'create'); }
+  get canUpdate() { return this.auth.canAction('services', 'update'); }
+  get canDelete() { return this.auth.canAction('services', 'delete'); }
 
   ngOnInit() { this.load(); }
 

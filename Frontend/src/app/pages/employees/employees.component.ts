@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { EmployeeService, Employee } from '../../services/employee.service';
 import { ConfirmDialogService } from '../../services/confirm-dialog.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-employees',
@@ -27,7 +28,15 @@ export class EmployeesComponent implements OnInit {
     name: '', email: '', phone: '', position: '', department: '', salary: null, hireDate: ''
   };
 
-  constructor(private service: EmployeeService, private confirm: ConfirmDialogService) {}
+  constructor(
+    private service: EmployeeService,
+    private confirm: ConfirmDialogService,
+    private auth: AuthService
+  ) {}
+
+  get canCreate() { return this.auth.canAction('employees', 'create'); }
+  get canUpdate() { return this.auth.canAction('employees', 'update'); }
+  get canDelete() { return this.auth.canAction('employees', 'delete'); }
 
   ngOnInit() {
     this.load();

@@ -2,6 +2,12 @@ const User = require('../models/User');
 const Employee = require('../models/Employee');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = require('../config/jwt');
+const { PERMISSIONS } = require('../config/permissions');
+
+function sanitizePermissions(body) {
+    if (!Array.isArray(body.permissions)) return [];
+    return [...new Set(body.permissions.filter(p => PERMISSIONS.includes(p)))];
+}
 
 async function syncEmployee(user) {
     if (user.role === 'customer') {
@@ -41,7 +47,8 @@ exports.getById = async (req, res) => {
 
 exports.create = async (req, res) => {
     try {
-        const user = await User.create(req.body);
+        const payload = { ...req.body, permissions: sanitizePermissions(req.body) };
+        const user = await User.create(payload);
         if (user.role !== 'customer') {
             try {
                 await syncEmployee(user);
@@ -58,7 +65,8 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
-        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const payload = { ...req.body, permissions: sanitizePermissions(req.body) };
+        const user = await User.findByIdAndUpdate(req.params.id, payload, { new: true, runValidators: true });
         if (!user) return res.status(404).json({ error: 'User not found' });
         try {
             await syncEmployee(user);
@@ -110,7 +118,8 @@ exports.login = async (req, res) => {
             user: {
                 id: user._id,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                permissions: user.permissions || []
             }
         });
     } catch (err) {

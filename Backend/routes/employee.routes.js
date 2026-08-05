@@ -2,13 +2,13 @@ const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/employee.controller');
 const auth = require('../middleware/auth');
-const role = require('../middleware/role');
+const perm = require('../middleware/perm');
 
-router.get('/', auth, role('admin', 'staff'), ctrl.getAll);
-router.get('/:id', auth, role('admin', 'staff'), ctrl.getById);
-router.post('/', auth, role('admin', 'staff'), ctrl.create);
-router.put('/:id', auth, role('admin', 'staff'), ctrl.update);
-router.patch('/:id/status', auth, role('admin', 'staff'), ctrl.toggleStatus);
-router.delete('/:id', auth, role('admin'), ctrl.remove);
+router.get('/', auth, perm('employees'), ctrl.getAll);
+router.get('/:id', auth, perm('employees'), ctrl.getById);
+router.post('/', auth, perm('employees:create'), ctrl.create);
+router.put('/:id', auth, perm('employees:update'), ctrl.update);
+router.patch('/:id/status', auth, perm('employees:update'), ctrl.toggleStatus);
+router.delete('/:id', auth, perm('employees:delete'), ctrl.remove);
 
 module.exports = router;

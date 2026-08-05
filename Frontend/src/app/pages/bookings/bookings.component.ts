@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BookingService, Booking, Customer, Room, BookedService } from '../../services/booking.service';
 import { ServiceService, Service } from '../../services/service.service';
 import { ConfirmDialogService } from '../../services/confirm-dialog.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-bookings',
@@ -9,7 +10,7 @@ import { ConfirmDialogService } from '../../services/confirm-dialog.service';
     <div class="page">
       <div class="page-header">
         <h1>Bookings</h1>
-        <button class="btn btn-primary" (click)="showForm = true">+ Create Booking</button>
+        <button class="btn btn-primary" *ngIf="canCreate" (click)="showForm = true">+ Create Booking</button>
       </div>
 
       <div class="stats" *ngIf="bookings.length">
@@ -122,17 +123,17 @@ import { ConfirmDialogService } from '../../services/confirm-dialog.service';
                 <td>
                   <span *ngIf="b.services?.length" class="service-count" (click)="openServices(b)">{{ b.services.length }} item(s)</span>
                   <span *ngIf="!b.services?.length" class="muted">---</span>
-                  <button class="icon-btn" title="Add service" (click)="openServices(b)">
+                  <button class="icon-btn" title="Add service" *ngIf="canUpdate" (click)="openServices(b)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                   </button>
                 </td>
                 <td>{{ b.totalAmount | currency }}</td>
                 <td><span class="badge" [ngClass]="b.status">{{ b.status }}</span></td>
                 <td>
-                  <button class="icon-btn" *ngIf="canCancel(b)" title="Cancel booking" (click)="onCancel(b)">
+                  <button class="icon-btn" *ngIf="canCancel(b) && canUpdate" title="Cancel booking" (click)="onCancel(b)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
                   </button>
-                  <span class="muted" *ngIf="!canCancel(b)">---</span>
+                  <span class="muted" *ngIf="!canCancel(b) || !canUpdate">---</span>
                 </td>
               </tr>
             </tbody>
@@ -159,7 +160,7 @@ import { ConfirmDialogService } from '../../services/confirm-dialog.service';
               <option *ngFor="let s of allServices" [value]="s._id">{{ s.name }} ({{ s.price | currency }})</option>
             </select>
             <input type="number" [(ngModel)]="newServiceQty" min="1" value="1" class="qty-input" />
-            <button class="btn btn-primary btn-sm" (click)="onAddService()" [disabled]="!newServiceId || !newServiceQty">Add</button>
+            <button class="btn btn-primary btn-sm" *ngIf="canUpdate" (click)="onAddService()" [disabled]="!newServiceId || !newServiceQty">Add</button>
           </div>
           <table class="service-table" *ngIf="selectedBooking.services?.length">
             <thead>
@@ -177,7 +178,7 @@ import { ConfirmDialogService } from '../../services/confirm-dialog.service';
                 <td>{{ item.price | currency }}</td>
                 <td>{{ item.quantity }}</td>
                 <td>{{ item.price * item.quantity | currency }}</td>
-                <td><button class="icon-btn" title="Remove" (click)="onRemoveService(item._id)">
+                <td><button class="icon-btn" title="Remove" *ngIf="canUpdate" (click)="onRemoveService(item._id)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                 </button></td>
               </tr>
@@ -226,8 +227,12 @@ export class BookingsComponent implements OnInit {
   constructor(
     private service: BookingService,
     private serviceService: ServiceService,
-    private confirm: ConfirmDialogService
+    private confirm: ConfirmDialogService,
+    private auth: AuthService
   ) {}
+
+  get canCreate() { return this.auth.canAction('bookings', 'create'); }
+  get canUpdate() { return this.auth.canAction('bookings', 'update'); }
 
   ngOnInit() {
     this.load();

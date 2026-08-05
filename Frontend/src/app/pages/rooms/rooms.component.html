@@ -1,7 +1,7 @@
 <div class="page">
   <div class="page-header">
     <h1>Rooms</h1>
-    <button class="btn btn-primary" (click)="openAdd()">+ Add Room</button>
+    <button class="btn btn-primary" *ngIf="canCreate" (click)="openAdd()">+ Add Room</button>
   </div>
 
   <div class="stats">
@@ -123,13 +123,13 @@
             </td>
             <td>
               <div class="action-btns">
-                <button class="icon-btn" title="Edit" (click)="openEdit(r)">
+                <button class="icon-btn" title="Edit" *ngIf="canUpdate" (click)="openEdit(r)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                 </button>
-                <button class="icon-btn" *ngIf="r.currentStatus !== 'booked'" [title]="r.isAvailable ? 'Set Maintenance' : 'Set Available'" (click)="toggleStatus(r)">
+                <button class="icon-btn" *ngIf="canUpdate && r.currentStatus !== 'booked'" [title]="r.isAvailable ? 'Set Maintenance' : 'Set Available'" (click)="toggleStatus(r)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
                 </button>
-                <button class="icon-btn" title="Delete" (click)="onDelete(r)">
+                <button class="icon-btn" title="Delete" *ngIf="canDelete" (click)="onDelete(r)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                 </button>
               </div>

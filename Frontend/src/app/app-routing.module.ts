@@ -12,6 +12,7 @@ import { ServicesComponent } from './pages/services/services.component';
 import { SettingsComponent } from './pages/settings/settings.component';
 import { UserComponent } from './pages/user/user.component';
 import { authGuard } from './services/auth.guard';
+import { permGuard } from './services/perm.guard';
 import { AuthService } from './services/auth.service';
 import { PublicHomeComponent } from './pages/public-home/public-home.component';
 import { RoomDetailComponent } from './pages/room-detail/room-detail.component';
@@ -35,15 +36,15 @@ const routes: Routes = [
     }],
     component: LayoutComponent,
     children: [
-      { path: 'bookings', component: BookingsComponent },
-      { path: 'bookings/report', component: BookingsReportComponent },
-      { path: 'customers', component: CustomersComponent },
-      { path: 'employees', component: EmployeesComponent },
-      { path: 'payments', component: PaymentsComponent },
-      { path: 'rooms', component: RoomsComponent },
-      { path: 'services', component: ServicesComponent },
-      { path: 'settings', component: SettingsComponent },
-      { path: 'user', component: UserComponent },
+      { path: 'bookings', component: BookingsComponent, canActivate: [permGuard('bookings')] },
+      { path: 'bookings/report', component: BookingsReportComponent, canActivate: [permGuard('reports')] },
+      { path: 'customers', component: CustomersComponent, canActivate: [permGuard('customers')] },
+      { path: 'employees', component: EmployeesComponent, canActivate: [permGuard('employees')] },
+      { path: 'payments', component: PaymentsComponent, canActivate: [permGuard('payments')] },
+      { path: 'rooms', component: RoomsComponent, canActivate: [permGuard('rooms')] },
+      { path: 'services', component: ServicesComponent, canActivate: [permGuard('services')] },
+      { path: 'settings', component: SettingsComponent, canActivate: [permGuard('settings')] },
+      { path: 'user', component: UserComponent, canActivate: [permGuard('users')] },
     ]
   },
   { path: '**', redirectTo: '' }

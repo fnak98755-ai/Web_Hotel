@@ -7,6 +7,7 @@ export interface User {
   id: string;
   email: string;
   role: string;
+  permissions?: string[];
 }
 
 export interface LoginResponse {
@@ -46,7 +47,10 @@ export class AuthService {
 
   getUser(): User | null {
     const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    if (!user) return null;
+    const parsed = JSON.parse(user) as User;
+    parsed.permissions = parsed.permissions || [];
+    return parsed;
   }
 
   isLoggedIn(): boolean {
@@ -58,11 +62,34 @@ export class AuthService {
     return !!user && roles.includes(user.role);
   }
 
+  hasPerm(...perms: string[]): boolean {
+    const user = this.getUser();
+    if (!user) return false;
+    if (user.role === 'admin') return true;
+    const userPerms = user.permissions || [];
+    return perms.some(p =>
+      userPerms.includes(p) || userPerms.some(u => u.startsWith(p + ':'))
+    );
+  }
+
+  canAction(module: string, action: string): boolean {
+    return this.hasPerm(`${module}:${action}`);
+  }
+
   isAdmin(): boolean {
     return this.hasRole('admin');
   }
 
   isStaff(): boolean {
     return this.hasRole('staff');
+  }
+
+  refreshUser(): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/me`).pipe(
+      tap(user => {
+        user.permissions = user.permissions || [];
+        localStorage.setItem('user', JSON.stringify(user));
+      })
+    );
   }
 }

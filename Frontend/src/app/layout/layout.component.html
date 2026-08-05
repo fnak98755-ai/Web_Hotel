@@ -9,7 +9,7 @@
     <nav class="nav">
       <div class="nav-section">Booking Services</div>
 
-      <a routerLink="/bookings" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item">
+      <a routerLink="/bookings" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-item" *ngIf="can('bookings')">
         <span class="nav-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
@@ -19,7 +19,7 @@
         </span>
         <span class="nav-label">Bookings</span>
       </a>
-      <a routerLink="/bookings/report" routerLinkActive="active" class="nav-item">
+      <a routerLink="/bookings/report" routerLinkActive="active" class="nav-item" *ngIf="can('reports')">
         <span class="nav-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -31,7 +31,7 @@
         </span>
         <span class="nav-label">Reports</span>
       </a>
-      <a routerLink="/customers" routerLinkActive="active" class="nav-item">
+      <a routerLink="/customers" routerLinkActive="active" class="nav-item" *ngIf="can('customers')">
         <span class="nav-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -42,7 +42,7 @@
         </span>
         <span class="nav-label">Customers</span>
       </a>
-      <a routerLink="/employees" routerLinkActive="active" class="nav-item">
+      <a routerLink="/employees" routerLinkActive="active" class="nav-item" *ngIf="can('employees')">
         <span class="nav-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -51,7 +51,7 @@
         </span>
         <span class="nav-label">Employees</span>
       </a>
-      <a routerLink="/payments" routerLinkActive="active" class="nav-item">
+      <a routerLink="/payments" routerLinkActive="active" class="nav-item" *ngIf="can('payments')">
         <span class="nav-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="1" y="4" width="22" height="16" rx="2"/>
@@ -60,7 +60,7 @@
         </span>
         <span class="nav-label">Payments</span>
       </a>
-      <a routerLink="/rooms" routerLinkActive="active" class="nav-item">
+      <a routerLink="/rooms" routerLinkActive="active" class="nav-item" *ngIf="can('rooms')">
         <span class="nav-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 21V9l9-6 9 6v12"/>
@@ -69,7 +69,7 @@
         </span>
         <span class="nav-label">Rooms</span>
       </a>
-      <a routerLink="/services" routerLinkActive="active" class="nav-item">
+      <a routerLink="/services" routerLinkActive="active" class="nav-item" *ngIf="can('services')">
         <span class="nav-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"/>
@@ -104,7 +104,7 @@
         </span>
         <span class="nav-label">Users</span>
       </a>
-      <a routerLink="/settings" routerLinkActive="active" class="nav-item">
+      <a routerLink="/settings" routerLinkActive="active" class="nav-item" *ngIf="can('settings')">
         <span class="nav-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"/>

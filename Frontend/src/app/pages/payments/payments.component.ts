@@ -2,6 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { PaymentService, Payment } from '../../services/payment.service';
 import { BookingService, Booking } from '../../services/booking.service';
 import { ConfirmDialogService } from '../../services/confirm-dialog.service';
+import { AuthService } from '../../services/auth.service';
 import QRCode from 'qrcode';
 
 @Component({
@@ -41,8 +42,13 @@ export class PaymentsComponent implements OnInit {
   constructor(
     private paymentService: PaymentService,
     private bookingService: BookingService,
-    private confirm: ConfirmDialogService
+    private confirm: ConfirmDialogService,
+    private auth: AuthService
   ) {}
+
+  get canCreate() { return this.auth.canAction('payments', 'create'); }
+  get canUpdate() { return this.auth.canAction('payments', 'update'); }
+  get canDelete() { return this.auth.canAction('payments', 'delete'); }
 
   ngOnInit() {
     this.load();
