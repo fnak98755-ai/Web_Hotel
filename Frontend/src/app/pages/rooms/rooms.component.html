@@ -84,6 +84,8 @@
           <option value="booked">Booked</option>
           <option value="maintenance">Maintenance</option>
         </select>
+        <input type="date" [(ngModel)]="checkIn" (change)="load()" title="Check-in date" />
+        <input type="date" [(ngModel)]="checkOut" (change)="load()" title="Check-out date" />
         <input type="text" [(ngModel)]="searchTerm" (input)="applyFilter()" placeholder="Search room number..." />
       </div>
     </div>
@@ -117,6 +119,7 @@
                 <span class="status-dot" [ngClass]="(r.currentStatus || (r.isAvailable ? 'available' : 'maintenance')) === 'booked' ? 'orange' : ((r.currentStatus || (r.isAvailable ? 'available' : 'maintenance')) === 'available' ? 'green' : 'red')"></span>
                 {{ (r.currentStatus || (r.isAvailable ? 'Available' : 'Maintenance')) | titlecase }}
               </span>
+              <span class="booked-dates" *ngIf="r.currentStatus === 'booked' && bookedDatesLabel(r)">{{ bookedDatesLabel(r) }}</span>
             </td>
             <td>
               <div class="action-btns">

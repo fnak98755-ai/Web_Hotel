@@ -19,6 +19,8 @@ export class RoomsComponent implements OnInit {
   typeFilter = '';
   statusFilter = '';
   searchTerm = '';
+  checkIn = '';
+  checkOut = '';
 
   roomTypes = ['single', 'double', 'suite', 'deluxe'];
 
@@ -34,10 +36,23 @@ export class RoomsComponent implements OnInit {
   }
 
   load() {
-    this.service.getAll().subscribe(r => {
+    this.service.getAll(this.checkIn || undefined, this.checkOut || undefined).subscribe(r => {
       this.rooms = r;
       this.applyFilter();
     });
+  }
+
+  fmtDate(d: string): string {
+    if (!d) return '';
+    const dt = new Date(d);
+    return isNaN(dt.getTime()) ? d : dt.toLocaleDateString('en-GB');
+  }
+
+  bookedDatesLabel(r: Room): string {
+    const dates = r.bookedDates || [];
+    if (!dates.length) return '';
+    const list = dates.map(b => `${this.fmtDate(b.checkIn)} \u2013 ${this.fmtDate(b.checkOut)}`);
+    return 'Booked: ' + list.join(', ');
   }
 
   get stats() {

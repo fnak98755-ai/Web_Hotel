@@ -3,22 +3,54 @@ const Booking = require('../models/Booking');
 
 exports.getAll = async (req, res) => {
     try {
+        const { checkIn, checkOut } = req.query;
         const rooms = await Room.find().sort({ roomNumber: 1 });
+
         const now = new Date();
-        const activeBookings = await Booking.find({
+        const from = checkIn ? new Date(checkIn) : new Date(new Date().setHours(0, 0, 0, 0));
+        const to = checkOut ? new Date(checkOut) : new Date(from.getTime() + 24 * 60 * 60 * 1000);
+
+        const rangeBookings = await Booking.find({
+            status: { $nin: ['cancelled', 'checked_out'] },
+            $or: [
+                { checkIn: { $lt: to }, checkOut: { $gt: from } }
+            ]
+        });
+
+        const futureBookings = await Booking.find({
+            room: { $in: rooms.map(r => r._id) },
             status: { $nin: ['cancelled', 'checked_out'] },
             checkOut: { $gt: now },
-        });
-        const bookedRoomIds = new Set(activeBookings.map(b => b.room.toString()));
+        }).sort({ checkIn: 1 });
+
+        const rangeByRoom = {};
+        for (const b of rangeBookings) {
+            const rid = b.room.toString();
+            (rangeByRoom[rid] = rangeByRoom[rid] || []).push(b);
+        }
+        const futureByRoom = {};
+        for (const b of futureBookings) {
+            const rid = b.room.toString();
+            (futureByRoom[rid] = futureByRoom[rid] || []).push(b);
+        }
 
         const result = rooms.map(r => {
+            const rid = r._id.toString();
             let currentStatus = 'available';
             if (!r.isAvailable) {
                 currentStatus = 'maintenance';
-            } else if (bookedRoomIds.has(r._id.toString())) {
+            } else if ((rangeByRoom[rid] || []).length) {
                 currentStatus = 'booked';
             }
-            return { ...r.toObject(), currentStatus };
+            return {
+                ...r.toObject(),
+                currentStatus,
+                bookedDates: (futureByRoom[rid] || []).map(b => ({
+                    checkIn: b.checkIn,
+                    checkOut: b.checkOut,
+                    status: b.status,
+                })),
+            };
         });
 
         res.json(result);

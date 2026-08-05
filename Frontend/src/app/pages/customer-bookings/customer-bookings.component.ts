@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CustomerBookingService, CustomerBooking } from '../../services/customer-booking.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { ConfirmDialogService } from '../../services/confirm-dialog.service';
 
 @Component({
   selector: 'app-customer-bookings',
@@ -74,6 +75,7 @@ import { Router } from '@angular/router';
         <p>&copy; {{ currentYear }} SETEC Hotel</p>
       </footer>
     </div>
+    <app-confirm-dialog></app-confirm-dialog>
   `,
   styles: [`
     .page { min-height: 100vh; background: #f8f9fc; font-family: 'Inter','Segoe UI',system-ui,sans-serif; }
@@ -160,7 +162,8 @@ export class CustomerBookingsComponent implements OnInit {
   constructor(
     public api: CustomerBookingService,
     public auth: AuthService,
-    private router: Router
+    private router: Router,
+    private confirm: ConfirmDialogService
   ) {}
 
   ngOnInit() {
@@ -173,7 +176,10 @@ export class CustomerBookingsComponent implements OnInit {
   avatarColor(status: string): string { return this.colorMap[status] || '#888'; }
 
   logout() {
-    this.auth.logout();
-    this.router.navigate(['/']);
+    this.confirm.confirm('Logout', 'Are you sure you want to log out?').subscribe(r => {
+      if (!r) return;
+      this.auth.logout();
+      this.router.navigate(['/']);
+    });
   }
 }

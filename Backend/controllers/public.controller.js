@@ -8,25 +8,26 @@ exports.getRooms = async (req, res) => {
         const { checkIn, checkOut } = req.query;
         let rooms = await Room.find().sort({ roomNumber: 1 });
 
-        let bookedIds = [];
-        if (checkIn && checkOut) {
-            const ci = new Date(checkIn);
-            const co = new Date(checkOut);
-            const booked = await Booking.find({
-                status: { $nin: ['cancelled', 'checked_out'] },
-                $or: [
-                    { checkIn: { $lt: co }, checkOut: { $gt: ci } }
-                ]
-            });
-            bookedIds = booked.map(b => b.room.toString());
-        }
+        const now = new Date();
+        const from = checkIn ? new Date(checkIn) : new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const to = checkOut ? new Date(checkOut) : new Date(from.getTime() + 24 * 60 * 60 * 1000);
+
+        const booked = await Booking.find({
+            status: { $nin: ['cancelled', 'checked_out'] },
+            $or: [
+                { checkIn: { $lt: to }, checkOut: { $gt: from } }
+            ]
+        });
+        const bookedIds = new Set(booked.map(b => b.room.toString()));
 
         const result = rooms.map(r => {
-            const isBooked = !r.isAvailable || bookedIds.includes(r._id.toString());
-            return {
-                ...r.toObject(),
-                availability: isBooked ? 'booked' : 'available',
-            };
+            let availability = 'available';
+            if (!r.isAvailable) {
+                availability = 'unavailable';
+            } else if (bookedIds.has(r._id.toString())) {
+                availability = 'booked';
+            }
+            return { ...r.toObject(), availability };
         });
 
         res.json(result);
@@ -42,27 +43,23 @@ exports.getRoomById = async (req, res) => {
 
         const { checkIn, checkOut } = req.query;
 
-        const query = {
-            room: room._id,
-            status: { $nin: ['cancelled'] },
-        };
-        if (checkIn && checkOut) {
-            const ci = new Date(checkIn);
-            const co = new Date(checkOut);
-            query.$or = [
-                { checkIn: { $lt: co }, checkOut: { $gt: ci } }
-            ];
-        }
+        const now = new Date();
+        const from = checkIn ? new Date(checkIn) : new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const to = checkOut ? new Date(checkOut) : new Date(from.getTime() + 24 * 60 * 60 * 1000);
 
-        const booking = await Booking.findOne(query).sort({ createdAt: -1 });
+        const booking = await Booking.findOne({
+            room: room._id,
+            status: { $nin: ['cancelled', 'checked_out'] },
+            $or: [
+                { checkIn: { $lt: to }, checkOut: { $gt: from } }
+            ]
+        }).sort({ createdAt: -1 });
 
         let availability = 'available';
         if (!room.isAvailable) {
             availability = 'unavailable';
         } else if (booking) {
-            availability = booking.status === 'checked_in' ? 'checked_in'
-                : booking.status === 'checked_out' ? 'checked_out'
-                : 'booked';
+            availability = booking.status === 'checked_in' ? 'checked_in' : 'booked';
         }
 
         res.json({

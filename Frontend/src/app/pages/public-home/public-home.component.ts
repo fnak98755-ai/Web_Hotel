@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PublicService, PublicRoom, HotelInfo } from '../../services/public.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { ConfirmDialogService } from '../../services/confirm-dialog.service';
 
 @Component({
   selector: 'app-public-home',
@@ -62,12 +63,12 @@ import { Router } from '@angular/router';
         </div>
 
         <div class="grid" *ngIf="!loading">
-          <div class="room-card" *ngFor="let room of rooms; let i = index" (click)="room.availability === 'available' && bookRoom(room._id)" [class.booked]="room.availability === 'booked'" [style.animation-delay]="i * 0.08 + 's'">
+          <div class="room-card" *ngFor="let room of rooms; let i = index" (click)="room.availability !== 'unavailable' && bookRoom(room._id)" [class.unavailable]="room.availability === 'unavailable'" [style.animation-delay]="i * 0.08 + 's'">
             <div class="card-img">
               <img [src]="roomImage(room)" alt="Room {{ room.roomNumber }}" class="room-img" loading="lazy" />
               <div class="card-badge">{{ '$' + room.pricePerNight }}<span>/night</span></div>
               <div class="card-rating">&#9733;&#9733;&#9733;&#9733;&#9733; <span>5.0</span></div>
-              <div class="booked-badge" *ngIf="room.availability === 'booked'">Booked</div>
+              <div class="booked-badge unavailable-badge" *ngIf="room.availability === 'unavailable'">Unavailable</div>
             </div>
             <div class="card-body">
               <div class="card-top">
@@ -84,7 +85,7 @@ import { Router } from '@angular/router';
                 <span class="tag more" *ngIf="(room.amenities || []).length > 4">+{{ (room.amenities || []).length - 4 }}</span>
               </div>
             </div>
-            <button class="card-cta" [class.disabled]="room.availability === 'booked'">{{ room.availability === 'booked' ? 'Not Available' : 'Book Now' }} <span *ngIf="room.availability === 'available'">&#8594;</span></button>
+            <button class="card-cta" [class.disabled]="room.availability === 'unavailable'">{{ room.availability === 'unavailable' ? 'Unavailable' : 'Book Now' }} <span *ngIf="room.availability !== 'unavailable'">&#8594;</span></button>
           </div>
 
           <div class="empty" *ngIf="rooms.length === 0">
@@ -160,6 +161,7 @@ import { Router } from '@angular/router';
         </div>
       </footer>
     </div>
+    <app-confirm-dialog></app-confirm-dialog>
   `,
   styles: [`
     .page { min-height: 100vh; background: #f8f9fc; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
@@ -242,9 +244,9 @@ import { Router } from '@angular/router';
     .card-cta.disabled:hover { background: #aaa !important; color: #fff !important; }
     .card-cta.disabled:hover span { transform: none; }
     .booked-badge { position: absolute; top: 16px; right: 16px; background: #e53935; color: #fff; padding: 4px 12px; border-radius: 5px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; z-index: 2; }
-    .room-card.booked { cursor: default; opacity: 0.7; }
-    .room-card.booked:hover { transform: none; box-shadow: none; }
-    .room-card.booked .card-img::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.15); z-index: 1; }
+    .unavailable-badge { background: #999; }
+    .room-card.unavailable { cursor: not-allowed; opacity: 0.6; }
+    .room-card.unavailable:hover { transform: none; box-shadow: none; }
     .empty { grid-column: 1 / -1; text-align: center; padding: 80px 20px; }
     .empty-icon { font-size: 56px; display: block; margin-bottom: 16px; }
     .empty h3 { font-size: 20px; color: #333; margin-bottom: 8px; }
@@ -338,7 +340,8 @@ export class PublicHomeComponent implements OnInit {
   constructor(
     public api: PublicService,
     public auth: AuthService,
-    private router: Router
+    private router: Router,
+    private confirm: ConfirmDialogService
   ) {}
 
   ngOnInit() {
@@ -355,7 +358,7 @@ export class PublicHomeComponent implements OnInit {
   }
 
   onDateChange() {
-    if (this.checkIn && this.checkOut) this.loadRooms();
+    this.loadRooms();
   }
 
   clearDates() {
@@ -369,7 +372,10 @@ export class PublicHomeComponent implements OnInit {
   }
 
   logout() {
-    this.auth.logout();
-    this.router.navigate(['/']);
+    this.confirm.confirm('Logout', 'Are you sure you want to log out?').subscribe(r => {
+      if (!r) return;
+      this.auth.logout();
+      this.router.navigate(['/']);
+    });
   }
 }

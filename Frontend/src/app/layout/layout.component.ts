@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Router, NavigationEnd } from '@angular/router';
+import { ConfirmDialogService } from '../services/confirm-dialog.service';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
@@ -14,7 +15,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
   sidebarOpen = false;
   private navSub!: Subscription;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router, private confirm: ConfirmDialogService) {}
 
   ngOnInit() {
     this.navSub = this.router.events
@@ -39,7 +40,10 @@ export class LayoutComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.auth.logout();
-    this.router.navigate(['/login']);
+    this.confirm.confirm('Logout', 'Are you sure you want to log out?').subscribe(r => {
+      if (!r) return;
+      this.auth.logout();
+      this.router.navigate(['/login']);
+    });
   }
 }

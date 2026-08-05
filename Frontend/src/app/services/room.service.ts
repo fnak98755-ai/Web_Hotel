@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
@@ -15,6 +15,7 @@ export interface Room {
   isAvailable: boolean;
   images: string[];
   currentStatus?: 'available' | 'booked' | 'maintenance';
+  bookedDates?: { checkIn: string; checkOut: string; status: string }[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -27,8 +28,11 @@ export class RoomService {
     return { Authorization: `Bearer ${this.auth.getToken()}` };
   }
 
-  getAll(): Observable<Room[]> {
-    return this.http.get<Room[]>(this.api, { headers: this.headers });
+  getAll(checkIn?: string, checkOut?: string): Observable<Room[]> {
+    let params = new HttpParams();
+    if (checkIn) params = params.set('checkIn', checkIn);
+    if (checkOut) params = params.set('checkOut', checkOut);
+    return this.http.get<Room[]>(this.api, { headers: this.headers, params });
   }
 
   getById(id: string): Observable<Room> {
